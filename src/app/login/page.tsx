@@ -2,10 +2,15 @@ import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { isMockMode } from "@/lib/config";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   if (isMockMode()) {
     redirect("/");
   }
+  const { error } = await searchParams;
 
   return (
     <div className="flex flex-1 items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
@@ -14,6 +19,11 @@ export default async function LoginPage() {
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Repositories • Storage • Commits • Cleanup
         </p>
+        {error === "AccessDenied" ? (
+          <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+            This GitHub account is not authorized to use this deployment.
+          </p>
+        ) : null}
         <form
           action={async () => {
             "use server";

@@ -27,3 +27,21 @@ export async function getCurrentUserLabel(): Promise<string> {
   const session = await auth();
   return session?.user?.email ?? session?.user?.name ?? "unknown-user";
 }
+
+/**
+ * Guards routes that read locally-stored data (backups, audit log) rather
+ * than calling GitHub directly, so they don't go through withOctokit's
+ * implicit auth check. Returns a 401 response to short-circuit with when
+ * unauthenticated, or null when the request may proceed.
+ */
+export async function requireAuthentication(): Promise<NextResponse | null> {
+  if (isMockMode()) return null;
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json(
+      { error: "GitHub connection has expired. Reconnect to continue." },
+      { status: 401 },
+    );
+  }
+  return null;
+}
