@@ -40,6 +40,13 @@ name, branch, or SHA without checking it first.
   the app serves synthetic demo data and skips authentication entirely.
   This is intentional and clearly indicated by a "DEMO DATA" badge in the
   UI; it must never be enabled in a deployment meant to show real data.
+- **Owner-only access (optional)**: set `ALLOWED_GITHUB_USERNAMES` (a
+  comma-separated allowlist) to restrict who may sign in at all. This is
+  enforced in the `signIn` callback (`src/lib/auth.ts`) before a session
+  is ever created, so a rejected account gets no session and cannot reach
+  any page or API route — not just the UI's login button. Leaving it
+  unset allows any GitHub account to sign in and use the app scoped to
+  their own repositories.
 
 ## Authorization
 

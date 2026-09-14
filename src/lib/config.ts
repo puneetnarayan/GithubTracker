@@ -9,6 +9,14 @@ export const config = {
   },
   nextAuthSecret: process.env.NEXTAUTH_SECRET ?? "",
   isProduction: process.env.NODE_ENV === "production",
+  // Comma-separated GitHub usernames allowed to sign in. Empty means
+  // unrestricted (any GitHub account may sign in and use the app against
+  // their own repositories). Set this to lock the deployment down to its
+  // owner — see ALLOWED_GITHUB_USERNAMES in .env.example.
+  allowedGithubLogins: (process.env.ALLOWED_GITHUB_USERNAMES ?? "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
 };
 
 /**

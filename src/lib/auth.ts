@@ -24,6 +24,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: config.nextAuthSecret || undefined,
   session: { strategy: "jwt" },
   callbacks: {
+    async signIn({ profile }) {
+      // Restricts who may authenticate at all when ALLOWED_GITHUB_USERNAMES
+      // is set — every feature in this app (including the history-cleanup
+      // wizard) is otherwise reachable by anyone with a GitHub account, each
+      // scoped to their own repos. An empty allowlist means unrestricted.
+      if (config.allowedGithubLogins.length === 0) return true;
+      const login = (profile as { login?: string } | undefined)?.login?.toLowerCase();
+      return !!login && config.allowedGithubLogins.includes(login);
+    },
     async jwt({ token, account }) {
       if (account?.access_token) {
         token.accessToken = account.access_token;
@@ -40,6 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 });
 
